@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GroqMind - Advanced AI Chatbot</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i data-lucide="zap" class="logo-icon"></i>
+                    <span>GroqMind</span>
+                </div>
+                <button class="icon-btn mobile-close" id="mobileCloseBtn">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+
+            <button class="new-chat-btn" id="newChatBtn">
+                <i data-lucide="plus"></i>
+                <span>New Chat</span>
+            </button>
+
+            <!-- Chat History List -->
+            <div class="history-container">
+                <div class="section-title">Recent Chats</div>
+                <div class="history-list" id="historyList">
+                    <!-- Loaded dynamically -->
+                    <div class="history-skeleton">
+                        <div class="skeleton-item"></div>
+                        <div class="skeleton-item"></div>
+                        <div class="skeleton-item"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar Bottom Settings -->
+            <div class="sidebar-settings">
+                <div class="settings-header">
+                    <i data-lucide="settings"></i>
+                    <span>Settings & Config</span>
+                </div>
+                
+                <div class="setting-group">
+                    <label for="apiKeyInput">Groq API Key</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="apiKeyInput" placeholder="Enter your Groq Key...">
+                        <button class="icon-btn visibility-toggle" id="apiKeyToggle" title="Toggle visibility">
+                            <i data-lucide="eye"></i>
+                        </button>
+                    </div>
+                    <small class="helper-text">Overrides backend .env key if provided.</small>
+                </div>
+
+                <div class="setting-group">
+                    <label for="modelSelect">LLM Model</label>
+                    <select id="modelSelect">
+                        <option value="llama-3.1-70b-versatile" selected>Llama 3.1 70B (Versatile)</option>
+                        <option value="llama-3.1-8b-instant">Llama 3.1 8B (Instant)</option>
+                        <option value="mixtral-8x7b-32768">Mixtral 8x7B (32k Context)</option>
+                        <option value="gemma2-9b-it">Gemma 2 9B (Google)</option>
+                    </select>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <main class="chat-area">
+            <!-- Top Navigation Bar -->
+            <header class="top-bar">
+                <div class="top-bar-left">
+                    <button class="icon-btn sidebar-toggle" id="sidebarToggleBtn">
+                        <i data-lucide="menu"></i>
+                    </button>
+                    <div class="active-chat-info">
+                        <h2 id="activeChatTitle">New Chat</h2>
+                        <span id="activeModelBadge" class="badge">Llama 3.1 70B</span>
+                    </div>
+                </div>
+                <div class="top-bar-right">
+                    <button class="btn btn-secondary" id="systemPromptToggleBtn">
+                        <i data-lucide="terminal"></i>
+                        <span>System Prompt</span>
+                    </button>
+                    <button class="btn btn-danger" id="clearChatBtn" title="Clear Chat History">
+                        <i data-lucide="trash-2"></i>
+                        <span>Clear</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Collapsible System Prompt Panel -->
+            <div class="system-prompt-panel" id="systemPromptPanel">
+                <div class="panel-header">
+                    <h3>Custom System Prompt</h3>
+                    <button class="icon-btn close-panel" id="systemPromptCloseBtn">
+                        <i data-lucide="x"></i>
+                    </button>
+                </div>
+                <div class="panel-body">
+                    <textarea id="systemPromptInput" placeholder="Define the AI persona and instructions here..."></textarea>
+                    <div class="panel-actions">
+                        <button class="btn btn-primary btn-sm" id="saveSystemPromptBtn">Apply System Prompt</button>
+                        <button class="btn btn-secondary btn-sm" id="resetSystemPromptBtn">Reset Default</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Messages Window -->
+            <div class="messages-container" id="messagesContainer">
+                <!-- Welcome/Landing State -->
+                <div class="welcome-container" id="welcomeContainer">
+                    <div class="welcome-logo">
+                        <i data-lucide="bot"></i>
+                    </div>
+                    <h1>Welcome to GroqMind</h1>
+                    <p class="welcome-subtitle">A high-performance chatbot powered by Groq and LangChain.</p>
+                    
+                    <div class="welcome-cards">
+                        <div class="welcome-card" onclick="setQuickPrompt('Explain quantum computing in simple terms.')">
+                            <i data-lucide="sparkles"></i>
+                            <h3>Creative Concept</h3>
+                            <p>"Explain quantum computing in simple terms..."</p>
+                        </div>
+                        <div class="welcome-card" onclick="setQuickPrompt('Write a clean JavaScript async fetch wrapper.')">
+                            <i data-lucide="code"></i>
+                            <h3>Code Generation</h3>
+                            <p>"Write a clean JavaScript async fetch wrapper..."</p>
+                        </div>
+                        <div class="welcome-card" onclick="setQuickPrompt('What are some effective tips for time management?')">
+                            <i data-lucide="compass"></i>
+                            <h3>Advice & Brainstorm</h3>
+                            <p>"What are some effective tips for time management?..."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Form -->
+            <footer class="input-area">
+                <form class="input-form" id="chatForm">
+                    <div class="input-box-wrapper">
+                        <textarea id="messageInput" placeholder="Type your message here... (Press Shift+Enter for new line)" rows="1"></textarea>
+                        <button type="submit" class="send-btn" id="sendBtn" disabled>
+                            <i data-lucide="arrow-up"></i>
+                        </button>
+                    </div>
+                </form>
+                <div class="footer-note">
+                    GroqMind is running locally. Messages are streamed directly via Groq's high-speed API.
+                </div>
+            </footer>
+        </main>
+    </div>
+</body>
+</html>
